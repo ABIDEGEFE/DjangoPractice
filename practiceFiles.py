@@ -1,10 +1,16 @@
-open_file = open("countries.txt", "r")
-lines = open_file.readlines()
-open_file = open("countries.txt", "w")
+createPythonFile = open("writeOnFiles.py", "w")
 
+createPythonFile.write(
+    "open_file = open('countries.txt', 'r')\n"
+    "lines = open_file.readlines()\n"
+    "for line in lines:\n"
+    "    line = line.strip()\n"
+    "    print('This is', line)\n"
+)
 
-for line in lines:
-    line = line.strip()
-    if "Canada" not in line and "Kenya" not in line:
-        open_file.write(line+"\n")
-open_file.close()
+createPythonFile.close()
+
+appendContent = open("writeOnFiles.py", "a")
+appendContent.write("\n# You have successfully appended content.")
+
+appendContent.close() 
