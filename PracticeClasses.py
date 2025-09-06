@@ -8,11 +8,12 @@ class Students:
         return f"Welocome, {self.name}. You are {self.age} years old and in grade {self.grade}."
     
 
-# StudentName = input("Enter your name: ")
-# StudentAge = int(input("Enter your age: "))
-# StudentGrade = int(input("Enter your grade: "))
+StudentName = input("Enter your name: ")
+StudentAge = int(input("Enter your age: "))
+StudentGrade = int(input("Enter your grade: "))
 
-# Student = Students(StudentName, StudentAge, StudentGrade)    
+Student = Students(StudentName, StudentAge, StudentGrade) 
+print(Student.name)  # Accessing the name property   
 
 # details = Student.get_details()
 # print(details)
