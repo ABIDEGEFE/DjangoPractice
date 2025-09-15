@@ -1,0 +1,16 @@
+.submit {
+    background-color: blue;
+    color: white;
+    font-size: 20px;
+    border-radius: 10px;
+    padding: 10px;
+    border: none;
+}
+
+.textArea {
+    font-size: 20px;
+    border-radius: 10px;
+    padding: 10px;
+    border: 2px solid black;
+    background-color: yellow;
+}

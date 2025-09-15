@@ -1,14 +1,15 @@
+{% load static %}
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
 </head>
 <body>
-     <form action="counter">
-        <textarea name="text" id="text" cols="70" rows="20"></textarea>
-        <input type="submit" value="Submit">
-     </form>
+  <h1>Welcome page</h1>
+  <img src="{% static 'assets/img/about/about-8.webp' %}" alt="Corporate Business" class="img-fluid">
 </body>
 </html>
