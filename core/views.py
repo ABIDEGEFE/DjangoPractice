@@ -1,13 +1,18 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-# Create your views here.
-def home(request):
-    return render(request, 'index.html')
+from django.http import JsonResponse
+from .models import Feature
 
-def about(request):
-    return render(request, 'about.html')   
 
-def counter(request):
-    text = request.POST['text']
-    amount_of_words = len(text.split())
-    return render(request, 'counter.html', {'amount': amount_of_words}) 
+def feature(request):
+    if request.method == "GET":
+        # For demo, just return one feature
+        feature1 = Feature()
+        feature1.id = 1
+        feature1.name = "Tracking system"
+        feature1.description = "It helps you who is tracking using his device."
+        return JsonResponse({
+            "id": feature1.id,
+            "name": feature1.name,
+            "description": feature1.description,
+        })
+    else:
+        return JsonResponse({"error": "Invalid request method"}, status=400)
