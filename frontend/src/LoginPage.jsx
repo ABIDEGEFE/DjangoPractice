@@ -1,14 +1,21 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const LoginPage = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password1, setPassword1] = useState("");
-  const [password2, setPassword2] = useState("");
-  const [message, setMessage] = useState("");
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password1: "",
+    password2: ""
+  });
 
-  const handleLogin = async (e) => {
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const { username, email, password1, password2 } = formData;
 
     const response = await fetch("http://127.0.0.1:8000/register", {
       method: "POST",
@@ -19,12 +26,21 @@ export const LoginPage = () => {
         username,
         email,
         password1,
-        password2,
+        password2
       }),
     });
 
     const data = await response.json();
     setMessage(data.message || data.error || "Unknown response");
+  };
+  const handleNavigate = () => {
+    navigate('/deleteUser')
+  }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
   return (
@@ -33,36 +49,41 @@ export const LoginPage = () => {
       <form onSubmit={handleLogin}>
         <input
           type="text"
+          name="username"
           placeholder="Enter your username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={formData.username}
+          onChange={handleInputChange}
         />
         <br />
         <input
           type="email"
+          name="email"
           placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={formData.email}
+          onChange={handleInputChange}
         />
         <br />
         <input
           type="password"
+          name="password1"
           placeholder="Enter your password"
-          value={password1}
-          onChange={(e) => setPassword1(e.target.value)}
+          value={formData.password1}
+          onChange={handleInputChange}
         />
         <br />
         <input
           type="password"
+          name="password2"
           placeholder="Confirm your password"
-          value={password2}
-          onChange={(e) => setPassword2(e.target.value)}
+          value={formData.password2}
+          onChange={handleInputChange}
         />
         <br />
         <input type="submit" value="Register" />
       </form>
 
       {message && <p>{message}</p>}
+      <button onClick={handleNavigate}>Delete user</button>
     </div>
   );
 };
