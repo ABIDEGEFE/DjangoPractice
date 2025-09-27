@@ -92,3 +92,104 @@ def get_data(request):
 
 ---
 
+## 📚 Lesson 5: How to Register and Delete Users
+
+This lesson demonstrates how to implement user registration and deletion using a React frontend and Django backend. It covers the request flow, data handling, and integration between both layers.
+
+---
+
+### 🧑‍💻 Frontend (React): User Registration
+
+To register a user, send a `POST` request with the required credentials:
+
+```tsx
+const response = await fetch('http://127.0.0.1:8000/register', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    username,
+    email,
+    password
+  })
+});
+
+const data = await response.json();
+```
+
+---
+
+### 🐍 Backend (Django): Handle Registration
+
+```python
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+import json
+
+@csrf_exempt
+def register(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+
+        User.objects.create_user(username=username, email=email, password=password)
+        return JsonResponse({"message": "User registered successfully."})
+    else:
+        return JsonResponse({"error": "Invalid request method."}, status=400)
+```
+
+---
+
+### 🧑‍💻 Frontend (React): Delete User
+
+To delete a user by email, send a `DELETE` request:
+
+```tsx
+const response = await fetch('http://127.0.0.1:8000/delete', {
+  method: 'DELETE',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    email
+  })
+});
+
+const data = await response.json();
+```
+
+---
+
+### 🐍 Backend (Django): Handle Deletion
+
+```python
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+import json
+
+@csrf_exempt
+def deleteUser(request):
+    if request.method == 'DELETE':
+        data = json.loads(request.body.decode('utf-8'))
+        email = data.get('email')
+
+        User.objects.filter(email=email).delete()
+        return JsonResponse({"message": f"User with email {email} deleted successfully."})
+    else:
+        return JsonResponse({"error": "Invalid request method."}, status=400)
+```
+
+
+
+
+
+
+    
+
+   
+
