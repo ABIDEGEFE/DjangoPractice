@@ -1,42 +1,46 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export const LoginPage = () => {
   const [formData, setFormData] = useState({
-    username: "",
     email: "",
-    password1: "",
-    password2: ""
+    password: ""
   });
 
   const [message, setMessage] = useState("");
+  const [userInfo, setUserInfo] = useState(null); // Store user info for display
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const { email, password } = formData;
+
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    const { username, email, password1, password2 } = formData;
+    try {
+      const response = await fetch("http://127.0.0.1:8000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
 
-    const response = await fetch("http://127.0.0.1:8000/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username,
-        email,
-        password1,
-        password2
-      }),
-    });
+      const data = await response.json();
+      console.log(data);
 
-    const data = await response.json();
-    setMessage(data.message || data.error || "Unknown response");
+      if (data.message === "success") {
+        setUserInfo({ username: data.username, email: data.email });
+        setMessage("Login successful!");
+        navigate('/home')
+      } else {
+        setMessage(data.message || "Unknown error occurred.");
+      }
+    } catch (err) {
+      setMessage("Something went wrong. Please try again.");
+    }
   };
-  const handleNavigate = () => {
-    navigate('/deleteUser')
-  }
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -45,45 +49,38 @@ export const LoginPage = () => {
 
   return (
     <div>
-      <h2>Register</h2>
+      <h2>Login</h2>
       <form onSubmit={handleLogin}>
-        <input
-          type="text"
-          name="username"
-          placeholder="Enter your username"
-          value={formData.username}
-          onChange={handleInputChange}
-        />
-        <br />
         <input
           type="email"
           name="email"
+          value={email}
           placeholder="Enter your email"
-          value={formData.email}
           onChange={handleInputChange}
+          required
         />
         <br />
         <input
           type="password"
-          name="password1"
+          name="password"
+          value={password}
           placeholder="Enter your password"
-          value={formData.password1}
           onChange={handleInputChange}
+          required
         />
         <br />
-        <input
-          type="password"
-          name="password2"
-          placeholder="Confirm your password"
-          value={formData.password2}
-          onChange={handleInputChange}
-        />
-        <br />
-        <input type="submit" value="Register" />
+        <button type="submit">Login</button>
       </form>
 
       {message && <p>{message}</p>}
-      <button onClick={handleNavigate}>Delete user</button>
+
+      {userInfo && (
+        <div>
+          <p>Welcome, {userInfo.username}. This is your email: {userInfo.email}</p>
+        </div>
+      )}
+
+      <Link to="/register">If you're a new user, register first</Link>
     </div>
   );
 };
