@@ -92,7 +92,6 @@ def get_data(request):
 
 ---
 
-## 📚 Lesson 5: How to Register and Delete Users
 
 This lesson demonstrates how to implement user registration and deletion using a React frontend and Django backend. It covers the request flow, data handling, and integration between both layers.
 
@@ -183,6 +182,96 @@ def deleteUser(request):
     else:
         return JsonResponse({"error": "Invalid request method."}, status=400)
 ```
+----
+
+## 🔐 User Authentication: Register and Login
+
+This section outlines how to implement user registration and login functionality using a React frontend and Django backend.
+
+---
+
+### 📝 Register
+
+Users can register using their **email**, **username**, and **password**. The frontend collects these credentials and sends them to the backend via a `POST` request.
+
+#### 📦 Frontend (React)
+
+```tsx
+const response = await fetch('http://127.0.0.1:8000/register', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ username, email, password })
+});
+
+const data = await response.json();
+```
+
+#### 🐍 Backend (Django)
+
+```python
+import json
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+
+data = json.loads(request.body.decode('utf-8'))
+username = data.get('username')
+email = data.get('email')
+password = data.get('password')
+
+User.objects.create_user(username=username, email=email, password=password)
+
+return JsonResponse({'message': 'User registered successfully'})
+```
+
+---
+
+### 🔑 Login
+
+The login flow is similar to registration. The frontend collects the user's **email** and **password**, and sends them to the backend for authentication.
+
+#### 📦 Frontend (React)
+
+```tsx
+const response = await fetch('http://127.0.0.1:8000/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email, password })
+});
+
+const data = await response.json();
+```
+
+#### 🐍 Backend (Django)
+
+```python
+import json
+from django.http import JsonResponse
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+
+data = json.loads(request.body.decode('utf-8'))
+email = data.get('email')
+password = data.get('password')
+
+try:
+    # finding user using is email
+    user = User.objects.get(email=email)
+except User.DoesNotExist:
+    return JsonResponse({"error": "Email not found"}, status=404)
+
+# check whether user is authenticated or not
+auth_user = authenticate(username=user.username, password=password)
+if auth_user is not None:
+    return JsonResponse({"message": "Login successful", "username": user.username})
+else:
+    return JsonResponse({"error": "Invalid credentials"}, status=401)
+```
+
+---
+
+
+
+
 
 
 
