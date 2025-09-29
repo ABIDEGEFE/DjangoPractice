@@ -7,12 +7,31 @@ import json
 from .models import Feature
 
 # ✅ Feature endpoint: returns all features
+
+@csrf_exempt
 def feature(request):
     if request.method == "GET":
-        feature1 = Feature.objects.all().values('id', 'name', 'description')
-        return JsonResponse(list(feature1), safe=False)
-    else:
-        return JsonResponse({"error": "Invalid request method"}, status=400)
+        features = Feature.objects.all().values('id', 'name', 'description', 'status')
+        return JsonResponse(list(features), safe=False)
+
+    elif request.method == "POST":
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+            name = data.get('name')
+            description = data.get('description')
+            status = data.get('status')
+
+            if not all([name, description, status]):
+                return JsonResponse({"error": "All fields are required"}, status=400)
+
+            Feature.objects.create(name=name, description=description, status=status)
+            return JsonResponse({"message": "Feature created successfully"})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+    
+
 
 # ✅ Register endpoint: creates a new user
 @csrf_exempt

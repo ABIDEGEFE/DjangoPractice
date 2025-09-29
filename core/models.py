@@ -4,4 +4,4 @@ from django.db import models
 class Feature(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
-
+    status = models.CharField(max_length=100, default='none')
