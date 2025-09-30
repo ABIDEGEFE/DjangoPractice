@@ -269,6 +269,77 @@ else:
 
 ---
 
+## 🌐 Accessing Public Databases via API
+
+In many applications, it's unnecessary to store all external data locally. Instead, we can retrieve real-time information from public APIs hosted on the internet. For example, weather data can be accessed directly from services like [weather.com](https://weather.com) using an API key.
+
+This approach allows us to:
+- Reduce database storage requirements
+- Access up-to-date information
+- Integrate third-party data seamlessly into our frontend/backend workflows
+
+---
+
+## 🔄 Workflow: React to Django to Public API
+
+### 1. **React Frontend: Send City Name to Django**
+
+```jsx
+const response = await fetch('http://127.0.0.1:8000/weather', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ city })
+});
+
+const data = await response.json();
+setData(data);
+```
+
+---
+
+### 2. **Django Backend: Forward City Name to Public API**
+
+```python
+import json
+import requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def weather(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+            city = data.get('city')
+            api_key = 'your_api_key_here'  # Replace with your actual API key
+            url = f'http://weather.api?key={api_key}&q={city}'
+
+            response = requests.get(url)
+            weather_data = response.json()
+
+            if 'error' in weather_data:
+                return JsonResponse({"error": weather_data['error']['message']}, status=400)
+
+            weather_info = {
+                'city': city,
+                'location': weather_data['location']['name'],
+                'temperature': weather_data['current']['temperature']
+            }
+
+            return JsonResponse(weather_info)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+```
+
+> 💡 Make sure to install the `requests` library:
+```bash
+pip install requests
+```
+
+
 
 
 
