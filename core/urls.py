@@ -12,5 +12,6 @@ urlpatterns = [
     path('feature', views.feature, name='feature'),
     path('register', views.register, name='register'),
     path('delete', views.deleteUser, name='delete'),
-    path('login', views.loginUser, name='login')
+    path('login', views.loginUser, name='login'),
+    path('weather', views.weatherInfo, name='weather'),
 ]

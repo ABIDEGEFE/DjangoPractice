@@ -91,6 +91,12 @@ export const Home = () => {
         Fetch Features
       </button>
 
+      <div>
+        <button onClick={() => handleNavigate('/weather')} style={{ marginTop: '10px' }}>
+          Go to Weather Info
+        </button>
+      </div>
+
       {message && <p>{message}</p>}
 
       {features.length > 0 && (

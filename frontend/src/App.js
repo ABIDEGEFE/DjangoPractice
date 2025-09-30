@@ -4,6 +4,7 @@ import { LoginPage } from "./LoginPage";
 import { DeleteUser } from "./DeleteUser";
 import { Home } from "./Home";
 import { Register } from "./Register";
+import { WeatherInfo } from "./WeatherInfo";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/deleteUser" element={<DeleteUser />} />
         <Route path='/register' element={<Register />} />
+        <Route path='/weather' element={<WeatherInfo />} />
       </Routes>
     </Router>
   );

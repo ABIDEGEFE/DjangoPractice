@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 import json
+import requests
 
 from .models import Feature
 
@@ -107,3 +108,37 @@ def loginUser(request):
             return JsonResponse({"error": str(e)}, status=400)
 
     return JsonResponse({"message": "invalid request"}, status=400)
+
+# ✅ Let's get weather information from a public API
+@csrf_exempt
+def weatherInfo(request):
+    if request.method == 'POST':
+
+        city = json.loads(request.body.decode("utf-8")).get("city")  # Default to London if no city is provided
+
+        api_key = '41d79749416c4306ad073718253009'
+        url = f'http://api.weatherapi.com/v1/current.json?key={api_key}&q={city}'
+
+        try:
+            response = requests.get(url)
+            data = response.json()
+
+            if 'error' in data:
+                return JsonResponse({"error": data['error']['message']}, status=400)
+
+            weather_info = {
+                "city": city,
+                "location": data['location']['name'],
+                "temperature": data['current']['temp_c'],
+                "condition": data['current']['condition']['text'],
+                "humidity": data['current']['humidity'],
+                "wind": data['current']['wind_kph']
+            }
+
+            return JsonResponse(weather_info)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+# Note: Replace 'your_api_key_here' with your actual API key from WeatherAPI.com
