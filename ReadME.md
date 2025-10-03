@@ -338,6 +338,142 @@ def weather(request):
 ```bash
 pip install requests
 ```
+------
+
+# 🔐 Django REST Framework Authentication with JWT
+
+This guide demonstrates how to implement stateless authentication using **JSON Web Tokens (JWT)** in Django REST Framework (DRF). It covers custom user models, password hashing, token generation, and secure request handling.
+
+---
+
+## 👤 Custom User Model
+
+Django provides a built-in `AbstractUser` class that can be extended to customize the user model:
+
+```python
+from django.contrib.auth.models import AbstractUser
+
+class User(AbstractUser):
+    # Add custom fields here if needed
+    pass
+```
+
+To register this model as the default user model:
+
+```python
+# settings.py
+AUTH_USER_MODEL = 'myapp.User'
+```
+
+---
+
+## 🔒 Password Hashing During Registration
+
+To securely store user passwords, use Django’s built-in `set_password()` method:
+
+```python
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import User
+
+class RegisterView(APIView):
+    def post(self, request):
+        data = request.data
+        user = User(username=data['username'], email=data['email'])
+        user.set_password(data['password'])  # Hashes the password
+        user.save()
+        return Response({"message": "User registered successfully"})
+```
+
+---
+
+## 🙈 Hiding Password in Serializer
+
+To prevent the password from being exposed in API responses:
+
+```python
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'password']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+```
+
+---
+
+## 🛡️ JWT for Stateless Authentication
+
+JWT is a compact, stateless token issued by the server after verifying user credentials. It contains all necessary information for authentication and authorization, eliminating the need for session storage.
+
+### 🔁 Authentication Flow
+
+#### 📤 Client Request
+
+```jsx
+const response = await fetch('/api/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email, password })
+});
+
+const data = await response.json();
+const token = data.token;
+```
+
+#### 📥 Server Response
+
+```python
+import jwt
+from rest_framework.response import Response
+
+def login_view(request):
+    user = User.objects.get(email=request.data['email'])
+    if user.check_password(request.data['password']):
+        payload = {
+            'id': user.id,
+            'exp': datetime.utcnow() + timedelta(hours=1),
+            'role': user.role
+        }
+        token = jwt.encode(payload, 'your_secret_key', algorithm='HS256')
+        return Response({'token': token})
+    return Response({'error': 'Invalid credentials'}, status=401)
+```
+
+---
+
+## 🔐 Token-Based Request Handling
+
+After login, the client must attach the token to every authenticated request:
+
+#### 📤 Client Request with Token
+
+```jsx
+const response = await fetch('/api/protected', {
+  method: 'GET',
+  headers: {
+    'Authorization': `Bearer ${token}`
+  }
+});
+```
+
+#### 📥 Server Token Validation
+
+```python
+import jwt
+
+def protected_view(request):
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        token = auth_header.split(' ')[1]
+        payload = jwt.decode(token, 'your_secret_key', algorithms=['HS256'])
+        user = User.objects.get(id=payload['id'])
+        return Response({'user': user.username})
+    return Response({'error': 'Unauthorized'}, status=401)
+```
+
+---
 
 
 
