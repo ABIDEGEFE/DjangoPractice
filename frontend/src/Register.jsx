@@ -3,10 +3,9 @@ import { useNavigate } from "react-router-dom";
 
 export const Register = () => {
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
-    password1: "",
-    password2: ""
+    password: "",
   });
 
   const [message, setMessage] = useState("");
@@ -15,28 +14,27 @@ export const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    const { username, email, password1, password2 } = formData;
+    const { name, email, password } = formData;
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/register", {
+      const response = await fetch("http://127.0.0.1:8000/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username,
+          name,
           email,
-          password1,
-          password2
+          password,
         }),
       });
 
       const data = await response.json();
-      const msg = data.message || data.error || "Unknown response";
+      const msg = data.message || "Registration successful!";
       setMessage(msg);
 
       // Navigate if registration was successful
-      if (msg.includes(username)) {
+      if (data.name == formData.name) {
         navigate("/");
       }
     } catch (err) {
@@ -57,9 +55,9 @@ export const Register = () => {
       <form onSubmit={handleRegister}>
         <input
           type="text"
-          name="username"
-          placeholder="Enter your username"
-          value={formData.username}
+          name="name"
+          placeholder="Enter your name"
+          value={formData.name}
           onChange={handleInputChange}
         />
         <br />
@@ -73,12 +71,12 @@ export const Register = () => {
         <br />
         <input
           type="password"
-          name="password1"
+          name="password"
           placeholder="Enter your password"
-          value={formData.password1}
+          value={formData.password}
           onChange={handleInputChange}
         />
-        <br />
+        {/* <br />
         <input
           type="password"
           name="password2"
@@ -86,7 +84,7 @@ export const Register = () => {
           value={formData.password2}
           onChange={handleInputChange}
         />
-        <br />
+        <br /> */}
         <input type="submit" value="Register" />
       </form>
 

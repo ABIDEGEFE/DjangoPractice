@@ -8,7 +8,7 @@ export const LoginPage = () => {
   });
 
   const [message, setMessage] = useState("");
-  const [userInfo, setUserInfo] = useState(null); // Store user info for display
+  const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
 
   const { email, password } = formData;
@@ -17,7 +17,7 @@ export const LoginPage = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/login", {
+      const response = await fetch("http://127.0.0.1:8000/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -26,14 +26,19 @@ export const LoginPage = () => {
       });
 
       const data = await response.json();
-      console.log(data);
+      console.log("Login response:", data);
 
-      if (data.message === "success") {
-        setUserInfo({ username: data.username, email: data.email });
+      if (response.ok && data.jwt) {
+        // Save token in localStorage
+        localStorage.setItem("token", data.jwt);
+
+        // Save user info
+        setUserInfo(data.user);
+
         setMessage("Login successful!");
-        navigate('/home')
+        navigate("/home");
       } else {
-        setMessage(data.message || "Unknown error occurred.");
+        setMessage(data.error || "Invalid credentials");
       }
     } catch (err) {
       setMessage("Something went wrong. Please try again.");
@@ -76,7 +81,9 @@ export const LoginPage = () => {
 
       {userInfo && (
         <div>
-          <p>Welcome, {userInfo.username}. This is your email: {userInfo.email}</p>
+          <p>
+            Welcome, {userInfo.username}. This is your email: {userInfo.email}
+          </p>
         </div>
       )}
 

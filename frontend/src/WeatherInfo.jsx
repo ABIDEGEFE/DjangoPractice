@@ -8,7 +8,7 @@ export const WeatherInfo = () => {
     const handleSearchCity = async (e) => {
         e.preventDefault();
 
-        const response = await fetch('http://localhost:8000/weather', {
+        const response = await fetch('http://localhost:8000/api/weather', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

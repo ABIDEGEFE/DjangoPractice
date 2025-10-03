@@ -5,7 +5,6 @@ from django.contrib.auth import authenticate
 import json
 import requests
 
-from .models import Feature
 
 # ✅ Feature endpoint: returns all features
 
@@ -126,7 +125,7 @@ def weatherInfo(request):
             if 'error' in data:
                 return JsonResponse({"error": data['error']['message']}, status=400)
 
-            weather_info = {
+            weather_info = { 
                 "city": city,
                 "location": data['location']['name'],
                 "temperature": data['current']['temp_c'],
@@ -142,3 +141,5 @@ def weatherInfo(request):
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
 # Note: Replace 'your_api_key_here' with your actual API key from WeatherAPI.com
+
+

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 export const Home = () => {
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const [userInfo, setUserInfo] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -34,7 +36,7 @@ export const Home = () => {
 
   const handleFetchFeature = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/feature', {
+      const response = await fetch('http://127.0.0.1:8000/api/feature', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -43,6 +45,27 @@ export const Home = () => {
       setFeature(data);
     } catch (err) {
       setMessage('Failed to fetch features.');
+    }
+  };
+
+  const handleShowUserInfo = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/user', {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        setUserInfo(userData);
+        console.log("User info:", userData);
+      } else {
+        setMessage("Failed to fetch user info.");
+      }
+    } catch (err) {
+      setMessage('Something went wrong.');
     }
   };
 
@@ -95,6 +118,15 @@ export const Home = () => {
         <button onClick={() => handleNavigate('/weather')} style={{ marginTop: '10px' }}>
           Go to Weather Info
         </button>
+      </div>
+
+      <div>
+        <button style={{position: 'absolute', top: 10, right: 10}} onClick={handleShowUserInfo}>
+          show user info
+        </button>
+        {userInfo && (
+          <p>This is your email: {userInfo.email} username: {userInfo.name}</p>
+        )}
       </div>
 
       {message && <p>{message}</p>}
